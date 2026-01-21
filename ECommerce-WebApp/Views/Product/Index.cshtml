@@ -1,6 +1,145 @@
-﻿@{
-    ViewData["Title"] = "Product Index";
+﻿@model IEnumerable<ECommerce_WebApp.Models.Product>
+
+@{
+    ViewData["Title"] = "Products";
+    var categories = ViewData["Categories"] as IEnumerable<ECommerce_WebApp.Models.Category>;
+    var brands = ViewData["Brands"] as IEnumerable<ECommerce_WebApp.Models.Brand>;
 }
 
-<h2>Product Index Page</h2>
-<p>This is a test page for the Product controller.</p>
+<h1>Products</h1>
+
+<hr />
+
+<!-- Filters Section -->
+<h3>Filters</h3>
+
+<form asp-action="Index" method="get">
+    <input type="hidden" name="searchString" value="@ViewData["CurrentFilter"]" />
+
+    <!-- Categories -->
+    <h4>Categories</h4>
+    <p>
+        <a href="@Url.Action("Index", new { categoryId = "", brandId = ViewData["CurrentBrand"], searchString = ViewData["CurrentFilter"] })">
+            All
+        </a>
+    </p>
+
+    @if (categories != null)
+    {
+        foreach (var category in categories)
+        {
+            <p>
+                <a href="@Url.Action("Index", new { categoryId = category.Id, brandId = ViewData["CurrentBrand"], searchString = ViewData["CurrentFilter"] })">
+                    @category.Name
+                </a>
+            </p>
+        }
+    }
+
+    <hr />
+
+    <!-- Brands -->
+    <h4>Brands</h4>
+    <p>
+        <a href="@Url.Action("Index", new { categoryId = ViewData["CurrentCategory"], brandId = "", searchString = ViewData["CurrentFilter"] })">
+            All
+        </a>
+    </p>
+
+    @if (brands != null)
+    {
+        foreach (var brand in brands)
+        {
+            <p>
+                <a href="@Url.Action("Index", new { categoryId = ViewData["CurrentCategory"], brandId = brand.Id, searchString = ViewData["CurrentFilter"] })">
+                    @brand.Name
+                </a>
+            </p>
+        }
+    }
+</form>
+
+<hr />
+
+<!-- Search -->
+<h3>Search Products</h3>
+
+<form asp-controller="Product" asp-action="Index" method="get">
+    <p>
+        <input type="text"
+               name="searchString"
+               placeholder="Search by name or description"
+               value="@ViewData["CurrentFilter"]" />
+    </p>
+
+    <input type="hidden" name="categoryId" value="@ViewData["CurrentCategory"]" />
+    <input type="hidden" name="brandId" value="@ViewData["CurrentBrand"]" />
+
+    <button type="submit">Search</button>
+</form>
+
+<hr />
+
+<!-- Message -->
+@if (TempData["Message"] != null)
+{
+    <p>@TempData["Message"]</p>
+    <hr />
+}
+
+<!-- Product List -->
+<h2>Product List</h2>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var product in Model)
+    {
+        <div>
+            <h3>@product.Name</h3>
+
+            @if (!string.IsNullOrEmpty(product.ImageUrl))
+            {
+                <img src="@product.ImageUrl" alt="@product.Name" width="200" />
+            }
+
+            <p>
+                <strong>Category:</strong> @product.Category?.Name
+            </p>
+
+            <p>
+                <strong>Brand:</strong> @product.Brand?.Name
+            </p>
+
+            <p>
+                <strong>Description:</strong><br />
+                @product.Description
+            </p>
+
+            <p>
+                <strong>Price:</strong> @product.Price.ToString("C")
+            </p>
+
+            <p>
+                <a asp-controller="Product"
+                   asp-action="Details"
+                   asp-route-id="@product.Id">
+                    View Details
+                </a>
+            </p>
+
+            <p>
+                <a asp-controller="Cart"
+                   asp-action="AddToCart"
+                   asp-route-productId="@product.Id">
+                    Add to Cart
+                </a>
+            </p>
+
+            <hr />
+        </div>
+    }
+}
+else
+{
+    <p>No products found.</p>
+}
