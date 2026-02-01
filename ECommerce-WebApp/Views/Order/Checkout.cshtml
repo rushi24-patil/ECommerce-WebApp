@@ -1,0 +1,64 @@
+﻿@model ECommerce_WebApp.Models.Cart
+@{
+    var products = ViewBag.Products as Dictionary<int, ECommerce_WebApp.Models.Product>;
+}
+
+<h2>Checkout</h2>
+
+<hr />
+
+@if (Model.CartItems == null || !Model.CartItems.Any())
+{
+    <p>Your cart is empty.</p>
+}
+else
+{
+    <h3>Order Summary</h3>
+
+    decimal total = 0;
+
+    foreach (var item in Model.CartItems)
+    {
+        if (products != null && products.TryGetValue(item.ProductId, out var product))
+        {
+            var price = product.Price * item.Quantity;
+            total += price;
+
+            <p>
+                <strong>@product.Name</strong> × @item.Quantity = @price.ToString("C")
+            </p>
+        }
+    }
+
+    <p>
+        <strong>Total:</strong> @total.ToString("C")
+    </p>
+
+    <hr />
+
+    <h3>Shipping Address</h3>
+
+
+
+
+    <form asp-action="PlaceOrder" method="post">
+        <p>
+            <label>Address:</label><br />
+            <input name="shippingAddress" placeholder="Address" required />
+        </p>
+        <p>
+            <label>City:</label><br />
+            <input name="city" placeholder="City" required />
+        </p>
+        <p>
+            <label>Postal Code:</label><br />
+            <input name="postalCode" placeholder="Postal Code" required />
+        </p>
+        <p>
+            <label>Country:</label><br />
+            <input name="country" placeholder="Country" required />
+        </p>
+
+        <button type="submit">Place Order</button>
+    </form>
+}

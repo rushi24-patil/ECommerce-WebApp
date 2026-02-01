@@ -1,0 +1,20 @@
+﻿@model ECommerce_WebApp.Models.Order
+
+
+<h2>Order Placed Successfully ;)</h2>
+<hr />
+
+<p><strong>Order ID:</strong> @Model.Id</p>
+<p><strong>Status:</strong> @Model.Status</p>
+<p><strong>Total:</strong> @Model.TotalAmount</p>
+
+<h3>Items</h3>
+
+@foreach (var item in Model.OrderItems)
+{
+    <p>
+
+        @item.Product.Name × @item.Quantity
+        = @(item.Price* item.Quantity)
+    </p>
+}
